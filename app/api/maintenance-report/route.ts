@@ -1,11 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
-export async function POST(req: NextRequest) {
-  const { clientName, siteName, month, year, pluginsUpdated, themesUpdated, backupsCompleted, uptimePercent, securityScans, issuesResolved, agencyName } = await req.json();
-  if (!clientName || !siteName) return NextResponse.json({ error: "Client name and site name are required" }, { status: 400 });
+export const runtime = "nodejs";
+export const maxDuration = 60;
 
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+export async function POST(req: NextRequest) {
+  try {
+    const { clientName, siteName, month, year, pluginsUpdated, themesUpdated, backupsCompleted, uptimePercent, securityScans, issuesResolved, agencyName } = await req.json();
+    if (!clientName || !siteName) return NextResponse.json({ error: "Client name and site name are required" }, { status: 400 });
+
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "Server misconfigured: OPENAI_API_KEY is not set." },
+        { status: 500 }
+      );
+    }
+
+    const client = new OpenAI({ apiKey });
 
   const prompt = `You are a professional WordPress agency writing a monthly maintenance report for a client. Generate a polished, professional client-facing report using the following data:
 
@@ -40,20 +52,30 @@ Format this as a professional Markdown document that could be copied into a PDF.
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
-      const streamResponse = await client.chat.completions.create({
-        model: "gpt-4o",
-        stream: true,
-        messages: [{ role: "user", content: prompt }],
-      });
-      for await (const chunk of streamResponse) {
-        const text = chunk.choices[0]?.delta?.content ?? "";
-        if (text) controller.enqueue(encoder.encode(text));
+      try {
+        const streamResponse = await client.chat.completions.create({
+          model: "gpt-4o",
+          stream: true,
+          messages: [{ role: "user", content: prompt }],
+        });
+        for await (const chunk of streamResponse) {
+          const text = chunk.choices[0]?.delta?.content ?? "";
+          if (text) controller.enqueue(encoder.encode(text));
+        }
+        controller.close();
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Unknown error from OpenAI.";
+        controller.enqueue(encoder.encode(`\n\n⚠️ **Error:** ${msg}\n`));
+        controller.close();
       }
-      controller.close();
     },
   });
 
   return new NextResponse(stream, {
     headers: { "Content-Type": "text/plain; charset=utf-8" },
   });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Unexpected server error.";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }
