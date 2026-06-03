@@ -22,6 +22,7 @@ const plugins = [
   "dc-speed-optimizer",
   "dc-maintenance-report",
   "dc-child-theme-builder",
+  "dc-link-checker",
 ];
 
 // Ensure output dir exists

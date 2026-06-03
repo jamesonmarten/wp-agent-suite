@@ -62,6 +62,18 @@ const agents = [
     badgeColor: "#a855f7",
     accentColor: "rgba(168,85,247,0.15)",
   },
+  {
+    id: "link-checker",
+    icon: "🔗",
+    name: "Broken Link Checker & Redirect Mapper",
+    tagline: "Crawl sitemaps, find broken links, export to WP Redirection plugin",
+    description:
+      "Scan any sitemap or URL list, get live HTTP status codes for every link, then export broken-link & redirect maps as CSV — including a one-click import file for the WordPress Redirection plugin.",
+    income: "$149–$497 per audit",
+    badge: "SEO Ops",
+    badgeColor: "#06b6d4",
+    accentColor: "rgba(6,182,212,0.15)",
+  },
 ];
 
 export default function Home() {
@@ -86,7 +98,7 @@ export default function Home() {
       {/* Hero */}
       <section style={{ maxWidth: 1100, margin: "0 auto", padding: "64px 24px 48px", textAlign: "center" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 14px", borderRadius: 999, fontSize: 12, fontWeight: 600, marginBottom: 20, background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.3)", color: "#a78bfa" }}>
-          🟢 5 AI Agents · Live
+          🟢 6 AI Agents · Live
         </div>
         <h1 style={{ fontSize: "clamp(32px,5vw,52px)", fontWeight: 800, lineHeight: 1.15, marginBottom: 16 }}>
           <span style={{ background: "linear-gradient(135deg,#a78bfa,#60a5fa,#34d399)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
